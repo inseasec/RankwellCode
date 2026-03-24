@@ -32,8 +32,12 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     	 try {
 
-    	        File dir = new File(UPLOAD_DIR);
-    	        if (!dir.exists()) dir.mkdirs();
+    	        File baseDir = new File(UPLOAD_DIR);
+    	        if (!baseDir.exists()) baseDir.mkdirs();
+
+    	        String safeOrgFolderName = sanitizeFolderName(orgName);
+    	        File organizationDir = new File(baseDir, safeOrgFolderName);
+    	        if (!organizationDir.exists()) organizationDir.mkdirs();
 
     	        Organization org;
 
@@ -58,20 +62,20 @@ public class OrganizationServiceImpl implements OrganizationService{
     	        if (orgLogo != null && !orgLogo.isEmpty()) {
 
     	            String fileName = System.currentTimeMillis() + "_" + orgLogo.getOriginalFilename();
-    	            File dest = new File(UPLOAD_DIR + fileName);
+    	            File dest = new File(organizationDir, fileName);
     	            orgLogo.transferTo(dest);
 
-    	            org.setOrgLogo("uploads/rankwellDemoData/" + fileName);
+    	            org.setOrgLogo("uploads/rankwellDemoData/" + safeOrgFolderName + "/" + fileName);
     	        }
 
     	        // 🔥 Media Upload
     	        if (orgBrandMedia != null && !orgBrandMedia.isEmpty()) {
 
     	            String fileName = System.currentTimeMillis() + "_" + orgBrandMedia.getOriginalFilename();
-    	            File dest = new File(UPLOAD_DIR + fileName);
+    	            File dest = new File(organizationDir, fileName);
     	            orgBrandMedia.transferTo(dest);
 
-    	            org.setOrgBrandMedia("uploads/rankwellDemoData/" + fileName);
+    	            org.setOrgBrandMedia("uploads/rankwellDemoData/" + safeOrgFolderName + "/" + fileName);
     	        }
 
     	        return organizationRepository.save(org);
@@ -88,5 +92,14 @@ public class OrganizationServiceImpl implements OrganizationService{
         }
         return organizationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
+    }
+
+    private String sanitizeFolderName(String orgName) {
+        if (orgName == null || orgName.trim().isEmpty()) {
+            return "unknown-organization";
+        }
+        return orgName.trim()
+                .replaceAll("[^a-zA-Z0-9._-]", "_")
+                .replaceAll("_+", "_");
     }
 }
