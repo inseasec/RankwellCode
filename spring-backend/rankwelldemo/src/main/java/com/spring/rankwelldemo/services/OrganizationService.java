@@ -18,5 +18,21 @@ public interface OrganizationService {
 		    );
 	  
 	  Organization getOrganizationDetails(Long id);
+
+	  Organization saveCurrentOrganization(
+	  		String orgName,
+	        String orgTagline,
+	        String orgEmail,
+	        String orgPhone,
+	        String orgAddress,
+	        String orgWebsite,
+	        String orgEstablishedYear,
+	        String orgValues,
+	        String orgAbout,
+	        String createdAt,
+	        MultipartFile orgLogo
+	    );
+
+	  Organization getCurrentOrganization();
 	  
 }

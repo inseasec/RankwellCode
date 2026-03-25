@@ -37,7 +37,18 @@ public class SecurityConfig {
 
 	       CorsConfiguration config = new CorsConfiguration();
 
-	        config.setAllowedOrigins(List.of("http://localhost:5173"));
+	        config.setAllowedOriginPatterns(List.of(
+	                "http://localhost",
+	                "http://localhost:*",
+	                "https://localhost",
+	                "https://localhost:*",
+	                "http://127.0.0.1:*",
+	                "https://127.0.0.1:*",
+	                "http://*.edtech.com",
+	                "http://*.edtech.com:*",
+	                "https://*.edtech.com",
+	                "https://*.edtech.com:*"
+	        ));
 	        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	        config.setAllowedHeaders(List.of("*"));
 

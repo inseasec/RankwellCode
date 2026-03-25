@@ -94,6 +94,51 @@ public class OrganizationServiceImpl implements OrganizationService{
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
     }
 
+    @Override
+    public Organization saveCurrentOrganization(
+            String orgName,
+            String orgTagline,
+            String orgEmail,
+            String orgPhone,
+            String orgAddress,
+            String orgWebsite,
+            String orgEstablishedYear,
+            String orgValues,
+            String orgAbout,
+            String createdAt,
+            MultipartFile orgLogo) {
+        Organization existingOrg = organizationRepository.findFirstByOrderByIdAsc().orElse(null);
+        Long existingId = existingOrg != null ? existingOrg.getId() : null;
+
+        Organization savedOrg = saveOrUpdateOrganization(
+                existingId,
+                orgName,
+                orgEmail,
+                orgPhone,
+                orgAddress,
+                orgLogo,
+                null,
+                orgAbout
+        );
+
+        savedOrg.setOrgTagline(orgTagline);
+        savedOrg.setOrgWebsite(orgWebsite);
+        savedOrg.setOrgEstablishedYear(orgEstablishedYear);
+        savedOrg.setOrgValues(orgValues);
+        savedOrg.setCreatedAt(
+                createdAt != null && !createdAt.isBlank()
+                        ? createdAt
+                        : (existingOrg != null ? existingOrg.getCreatedAt() : null)
+        );
+
+        return organizationRepository.save(savedOrg);
+    }
+
+    @Override
+    public Organization getCurrentOrganization() {
+        return organizationRepository.findFirstByOrderByIdAsc().orElse(new Organization());
+    }
+
     private String sanitizeFolderName(String orgName) {
         if (orgName == null || orgName.trim().isEmpty()) {
             return "unknown-organization";

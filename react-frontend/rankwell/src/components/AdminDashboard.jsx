@@ -20,13 +20,38 @@ import {
 import OrganizationForm from './OrganizationForm.jsx';
 import OrganizationGrid from './OrganizationGrid.jsx';
 import OrganizationDetails from './OrganizationDetails.jsx';
+import OrganizationView from './OrganizationView.jsx';
 
 const AdminDashboard = () => {
+    const API_BASE_URL = '';
+    const getLogoUrl = () => `${API_BASE_URL}/organization/current/logo?t=${Date.now()}`;
+    const normalizeOrganizationName = (value) => (value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    const mapBackendToFrontendOrganization = (apiOrg) => ({
+        id: apiOrg.id,
+        name: apiOrg.orgName || '',
+        tagline: apiOrg.orgTagline || '',
+        description: apiOrg.orgAbout || '',
+        values: apiOrg.orgValues || '',
+        email: apiOrg.orgEmail || '',
+        phone: apiOrg.orgPhone || '',
+        address: apiOrg.orgAddress || '',
+        website: apiOrg.orgWebsite || '',
+        establishedYear: apiOrg.orgEstablishedYear || '',
+        logo: apiOrg.orgLogo ? getLogoUrl() : null,
+        createdAt: apiOrg.createdAt || new Date().toISOString()
+    });
+
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [activePage, setActivePage] = useState('dashboard');
     const [organizations, setOrganizations] = useState([]);
     const [selectedOrg, setSelectedOrg] = useState(null);
     const [orgData, setOrgData] = useState(null);
+    const [tenantHostMismatch, setTenantHostMismatch] = useState(false);
+    const latestOrganization = selectedOrg || organizations[organizations.length - 1] || null;
 
     const organizationDetails = {
         name: "Rankwell",
@@ -56,35 +81,97 @@ const AdminDashboard = () => {
         }
     };
 
-    useEffect(() => { // Load organizations from localStorage
-        const savedOrgs = localStorage.getItem('organizations');
-        if (savedOrgs) {
-            setOrganizations(JSON.parse(savedOrgs));
-        }
+    useEffect(() => {
         setOrgData(organizationDetails);
+        const loadCurrentOrganization = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/organization/current`);
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                if (!data || !data.id) {
+                    return;
+                }
+                const mappedOrganization = mapBackendToFrontendOrganization(data);
+                setOrganizations([mappedOrganization]);
+                setSelectedOrg(mappedOrganization);
+            } catch (error) {
+                console.error('Failed to load organization data');
+            }
+        };
+
+        loadCurrentOrganization();
     }, []);
 
-    // Save organizations to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('organizations', JSON.stringify(organizations));
-    }, [organizations]);
+        const currentHost = window.location.hostname.toLowerCase();
+        if (!currentHost.endsWith('.edtech.com')) {
+            setTenantHostMismatch(false);
+            return;
+        }
+
+        const orgName = latestOrganization?.name;
+        if (!orgName) {
+            setTenantHostMismatch(false);
+            return;
+        }
+
+        const expectedSubdomain = normalizeOrganizationName(orgName);
+        if (!expectedSubdomain) {
+            setTenantHostMismatch(false);
+            return;
+        }
+
+        const currentSubdomain = currentHost.replace('.edtech.com', '');
+        setTenantHostMismatch(currentSubdomain !== expectedSubdomain);
+    }, [latestOrganization]);
 
     const handleLogout = () => {
         localStorage.removeItem('adminData');
         window.location.href = '/admin/login';
     };
 
-    const handleAddOrganization = (newOrg) => {
-        const orgWithId = {
+    const handleAddOrganization = async (newOrg) => {
+        const existingOrganization = organizations[0] || null;
+        const orgToSave = {
             ...newOrg,
-            id: Date.now(),
-            createdAt: new Date().toISOString()
+            id: existingOrganization?.id || Date.now(),
+            createdAt: existingOrganization?.createdAt || new Date().toISOString()
         };
-        setOrganizations([
-            ...organizations,
-            orgWithId
-        ]);
-        setActivePage('org-grid');
+        try {
+            const formData = new FormData();
+            formData.append('orgName', orgToSave.name || '');
+            formData.append('orgTagline', orgToSave.tagline || '');
+            formData.append('orgAbout', orgToSave.description || '');
+            formData.append('orgValues', orgToSave.values || '');
+            formData.append('orgEmail', orgToSave.email || '');
+            formData.append('orgPhone', orgToSave.phone || '');
+            formData.append('orgAddress', orgToSave.address || '');
+            formData.append('orgWebsite', orgToSave.website || '');
+            formData.append('orgEstablishedYear', orgToSave.establishedYear || '');
+            formData.append('createdAt', orgToSave.createdAt || new Date().toISOString());
+            if (orgToSave.logoFile) {
+                formData.append('orgLogo', orgToSave.logoFile);
+            }
+
+            const response = await fetch(`${API_BASE_URL}/organization/current`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save organization');
+            }
+
+            const savedOrganization = await response.json();
+            const mappedOrganization = mapBackendToFrontendOrganization(savedOrganization);
+            setOrganizations([mappedOrganization]);
+            setSelectedOrg(mappedOrganization);
+            setActivePage('view-org');
+        } catch (error) {
+            alert('Unable to save organization details. Please try again.');
+        }
     };
 
     const handleOrgClick = (org) => {
@@ -98,6 +185,8 @@ const AdminDashboard = () => {
     };
 
     const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+    const organizationBaseName = (latestOrganization?.name || '').trim();
+    const organizationBrandName = organizationBaseName ? `${organizationBaseName} Edtech` : 'Company Edtech';
 
     const menuItems = [
         {
@@ -106,12 +195,12 @@ const AdminDashboard = () => {
             icon: Home
         }, {
             id: 'org-form',
-            label: 'Add Organization',
+            label: 'Add/Edit Organization',
             icon: Building2
         }, {
-            id: 'org-grid',
-            label: 'Organizations List',
-            icon: LayoutGrid
+            id: 'view-org',
+            label: 'View Organization',
+            icon: Eye
         },
     ];
 
@@ -119,6 +208,17 @@ const AdminDashboard = () => {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center">
                 <div className="text-gray-500">Loading dashboard...</div>
+            </div>
+        );
+    }
+
+    if (tenantHostMismatch) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+                <div className="max-w-xl w-full bg-white rounded-lg shadow p-8 text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-3">404</h2>
+                    <p className="text-gray-600">Page does not exist.</p>
+                </div>
             </div>
         );
     }
@@ -134,9 +234,7 @@ const AdminDashboard = () => {
                 <div className="flex items-center justify-between p-4 border-b border-gray-800">
                     {
                     sidebarOpen && <h1 className="text-xl font-bold">
-                        {
-                        orgData.name
-                    }</h1>
+                        {organizationBrandName}</h1>
                 }
                     <button onClick={
                             () => setSidebarOpen(!sidebarOpen)
@@ -180,7 +278,7 @@ const AdminDashboard = () => {
                     {
                     sidebarOpen && (
                         <div className="text-xs text-gray-500">
-                            <p>Rankwell Admin Panel</p>
+                            <p>{organizationBrandName} Admin Panel</p>
                             <p>Version 1.0.0</p>
                         </div>
                     )
@@ -205,7 +303,10 @@ const AdminDashboard = () => {
                                     } Admin`
                                 }
                                     {
-                                    activePage === 'org-form' && 'Add New Organization'
+                                    activePage === 'org-form' && 'Add/Edit Organization'
+                                }
+                                    {
+                                    activePage === 'view-org' && 'View Organization'
                                 }
                                     {
                                     activePage === 'org-grid' && 'Organizations List'
@@ -240,7 +341,13 @@ const AdminDashboard = () => {
                 }
                     {
                     activePage === 'org-form' && (
-                        <OrganizationForm onSubmit={handleAddOrganization}/>
+                        <OrganizationForm onSubmit={handleAddOrganization}
+                            initialData={latestOrganization}/>
+                    )
+                }
+                    {
+                    activePage === 'view-org' && (
+                        <OrganizationView organization={latestOrganization}/>
                     )
                 }
                     {

@@ -16,9 +16,14 @@ public class Organization {
     private Long id;
 
     private String orgName;
+    private String orgTagline;
     private String orgEmail;
     private String orgPhone;
     private String orgAddress;
+    private String orgWebsite;
+    private String orgEstablishedYear;
+    private String orgValues;
+    private String createdAt;
 
     private String orgLogo;         // store file path
     private String orgBrandMedia;   // image/video path
@@ -54,6 +59,14 @@ public class Organization {
 		this.orgEmail = orgEmail;
 	}
 
+	public String getOrgTagline() {
+		return orgTagline;
+	}
+
+	public void setOrgTagline(String orgTagline) {
+		this.orgTagline = orgTagline;
+	}
+
 	public String getOrgPhone() {
 		return orgPhone;
 	}
@@ -68,6 +81,38 @@ public class Organization {
 
 	public void setOrgAddress(String orgAddress) {
 		this.orgAddress = orgAddress;
+	}
+
+	public String getOrgWebsite() {
+		return orgWebsite;
+	}
+
+	public void setOrgWebsite(String orgWebsite) {
+		this.orgWebsite = orgWebsite;
+	}
+
+	public String getOrgEstablishedYear() {
+		return orgEstablishedYear;
+	}
+
+	public void setOrgEstablishedYear(String orgEstablishedYear) {
+		this.orgEstablishedYear = orgEstablishedYear;
+	}
+
+	public String getOrgValues() {
+		return orgValues;
+	}
+
+	public void setOrgValues(String orgValues) {
+		this.orgValues = orgValues;
+	}
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public String getOrgLogo() {
