@@ -1,0 +1,13 @@
+com\spring\rankwelldemo\services\OrganizationService.class
+com\spring\rankwelldemo\serviceImpl\OrganizationServiceImpl.class
+com\spring\rankwelldemo\repository\OrganizationRepository.class
+com\spring\rankwelldemo\config\SecurityConfig.class
+com\spring\rankwelldemo\services\AdminService.class
+com\spring\rankwelldemo\controller\OrganizationController.class
+com\spring\rankwelldemo\serviceImpl\AdminServiceImpl.class
+com\spring\rankwelldemo\RankwelldemoApplication.class
+com\spring\rankwelldemo\controller\AuthController.class
+com\spring\rankwelldemo\repository\AdminRepository.class
+com\spring\rankwelldemo\config\SuperAdminInitializer.class
+com\spring\rankwelldemo\entity\Admin.class
+com\spring\rankwelldemo\entity\Organization.class
