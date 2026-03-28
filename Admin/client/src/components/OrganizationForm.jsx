@@ -83,7 +83,7 @@ const OrganizationForm = ({ onSubmit, onCancel, initialData }) => {
                         <Building2 className="w-6 h-6 text-orange-600 mr-2" />
                         <h2 className="text-xl font-semibold text-gray-800">Add/Edit Organization</h2>
                     </div>
-                    <p className="text-gray-500 text-sm mt-1">Add organization details first time, then edit the same details later // demo test</p>
+                    <p className="text-gray-500 text-sm mt-1">Add organization details first time, then edit the same details later // demo test new</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6">
