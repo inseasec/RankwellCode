@@ -51,7 +51,7 @@ const AdminLogin = () => {
             }
 
             if (response.ok) { // localStorage.setItem('adminToken', data.token);
-                navigate("/admin/dashboard")
+                navigate("/dashboard")
 
             } else {
                 setError(data.message || 'Login failed');

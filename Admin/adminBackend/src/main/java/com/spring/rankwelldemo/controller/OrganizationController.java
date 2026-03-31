@@ -5,8 +5,10 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +31,10 @@ public class OrganizationController {
 
 	@Autowired
     private OrganizationService organizationService;
+
+    /** Must match {@code OrganizationServiceImpl} uploads (global {@code ORG_MEDIA_UPLOAD_ROOT}). */
+    @Value("${org.media.upload-root}")
+    private String orgMediaUploadRoot;
 
     @PostMapping("/saveOrUpdateOrg")
     public Organization saveOrUpdateOrganization(
@@ -85,18 +91,32 @@ public class OrganizationController {
         }
 
         try {
-            Path filePath = Paths.get(System.getProperty("user.dir"))
-                    .resolve(currentOrganization.getOrgLogo())
-                    .normalize();
+            Path base = Paths.get(orgMediaUploadRoot).toAbsolutePath().normalize();
+            String relative = currentOrganization.getOrgLogo().trim().replace('\\', '/');
+            while (relative.startsWith("/")) {
+                relative = relative.substring(1);
+            }
+            Path filePath = base.resolve(relative).normalize();
+            String baseStr = base.toString().toLowerCase(Locale.ROOT);
+            String fileStr = filePath.toString().toLowerCase(Locale.ROOT);
+            if (!fileStr.startsWith(baseStr)) {
+                return ResponseEntity.badRequest().build();
+            }
+
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
                 return ResponseEntity.notFound().build();
             }
 
-            String contentType = Files.probeContentType(filePath);
-            if (contentType == null) {
-                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            try {
+                String probed = Files.probeContentType(filePath);
+                if (probed != null && !probed.isBlank()) {
+                    contentType = probed;
+                }
+            } catch (IOException ignored) {
+                // keep octet-stream / image default
             }
 
             return ResponseEntity.ok()

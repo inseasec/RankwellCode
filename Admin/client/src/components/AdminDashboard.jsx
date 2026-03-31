@@ -130,7 +130,7 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('adminData');
-        window.location.href = '/admin/login';
+        window.location.href = `${import.meta.env.BASE_URL}login`;
     };
 
     const handleAddOrganization = async (newOrg) => {

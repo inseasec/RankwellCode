@@ -8,6 +8,8 @@ export default defineConfig(({ mode }) => {
   const host = env.VITE_HOST || true
 
   return {
+    // App is served at http://<host>:<port>/admin/ (see BrowserRouter basename in App.jsx)
+    base: '/admin/',
     plugins: [tailwindcss(), react()],
     server: {
       host,

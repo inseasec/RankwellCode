@@ -7,19 +7,19 @@ import {Navigate} from 'react-router-dom';
 
 function App() {
     return (
-        <Router>
+        <Router basename="/admin">
             <Routes>
-                <Route path="/admin/login"
+                <Route path="/login"
                     element={<AdminLogin/>}/>
-                <Route path="/admin/dashboard"
-                    element={<AdminDashboard/>}/> {/* <Route path="/admin/dashboard"
+                <Route path="/dashboard"
+                    element={<AdminDashboard/>}/> {/* <Route path="/dashboard"
                     element={
                         <ProtectedRoute><AdminDashboard/></ProtectedRoute>
                     }/> */}
                 <Route path="/"
                     element={
                         <Navigate
-                    to="/admin/login"/>
+                    to="/login"/>
                     }/>
             </Routes>
         </Router>

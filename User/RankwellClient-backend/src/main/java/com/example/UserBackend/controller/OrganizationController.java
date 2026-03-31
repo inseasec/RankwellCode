@@ -46,7 +46,7 @@ public class OrganizationController {
 
         try {
             Path base = Paths.get(orgMediaUploadRoot).toAbsolutePath().normalize();
-            // DB stores paths like uploads/rankwellDemoData/OrgName/file.png (relative to Admin backend root)
+            // DB stores paths as OrgName/file.png relative to ORG_MEDIA_UPLOAD_ROOT
             String relative = currentOrganization.getOrgLogo().trim().replace('\\', '/');
             while (relative.startsWith("/")) {
                 relative = relative.substring(1);
