@@ -1,0 +1,13 @@
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\AdminBackendApplication.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\config\SecurityConfig.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\config\SuperAdminInitializer.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\controller\AuthController.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\controller\OrganizationController.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\entity\Admin.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\entity\Organization.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\repository\AdminRepository.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\repository\OrganizationRepository.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\serviceImpl\AdminServiceImpl.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\serviceImpl\OrganizationServiceImpl.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\services\AdminService.java
+C:\RankwellProject\RankwellCode\rankwell\Admin\adminBackend\src\main\java\com\spring\rankwelldemo\services\OrganizationService.java
